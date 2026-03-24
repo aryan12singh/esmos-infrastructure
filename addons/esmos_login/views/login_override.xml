@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Override the auth_signup login template to:
+        1. Replace "Don't have an account?" self-signup link
+           with a Jira Service Desk request link.
+        2. Keep the Reset Password link untouched.
+    -->
+    <template id="esmos_login_signup_link"
+              inherit_id="auth_signup.login"
+              name="ESMOS: Replace Signup with Jira Service Desk">
+
+        <xpath expr="//div[hasclass('justify-content-between')]" position="replace">
+            <div class="justify-content-between mt-2 d-flex small">
+                <!-- Jira link replaces self-registration -->
+                <a href="https://smu-team-ymiz3qlk.atlassian.net/servicedesk/customer/portals"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#875A7B;">
+                    Request Account Access
+                </a>
+                <!-- Keep the reset password link as-is -->
+                <a t-if="reset_password_enabled"
+                   t-attf-href="/web/reset_password?{{ keep_query() }}">
+                    Reset Password
+                </a>
+            </div>
+        </xpath>
+    </template>
+</odoo>

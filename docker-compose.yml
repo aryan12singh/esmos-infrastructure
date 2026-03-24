@@ -1,0 +1,88 @@
+name: is214
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
+      - moodle
+    restart: unless-stopped
+
+  web:
+    image: odoo:17
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8069"
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - ./addons:/mnt/extra-addons
+      - ./config:/etc/odoo
+      - /home/is214/filestore:/var/lib/odoo/filestore
+      - odoo-web-data:/var/lib/odoo
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  moodle:
+    image: bitnamilegacy/moodle
+    depends_on:
+      - moodledb
+    expose:
+      - "8080"
+    environment:
+      - MOODLE_DATABASE_HOST=moodledb
+      - MOODLE_DATABASE_PORT_NUMBER=3306
+      - MOODLE_DATABASE_USER=moodle
+      - MOODLE_DATABASE_PASSWORD=moodle
+      - MOODLE_DATABASE_NAME=moodle
+      - MOODLE_USERNAME=admin
+      - MOODLE_PASSWORD=Admin1234!
+      - MOODLE_SITE_NAME=ESMOS Healthcare Training
+      - BITNAMI_DEBUG=true
+    volumes:
+      - moodle-data:/bitnami/moodle
+      - moodle-data-persist:/bitnami/moodledata
+    restart: unless-stopped
+
+  moodledb:
+    image: mariadb:10.11
+    environment:
+      - MARIADB_ROOT_PASSWORD=root
+      - MARIADB_DATABASE=moodle
+      - MARIADB_USER=moodle
+      - MARIADB_PASSWORD=moodle
+      - MARIADB_CHARACTER_SET=utf8mb4
+      - MARIADB_COLLATE=utf8mb4_unicode_ci
+    volumes:
+      - moodle-db-data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:
+  moodle-data:
+  moodle-data-persist:
+  moodle-db-data:

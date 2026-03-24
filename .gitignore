@@ -1,0 +1,28 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Odoo filestore (large data, not version controlled)
+filestore/
+
+# Environment files
+.env
+*.env
+
+# Docker override files
+docker-compose.override.yml
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup
+backups/
