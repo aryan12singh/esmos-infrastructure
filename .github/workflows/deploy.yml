@@ -19,6 +19,6 @@ jobs:
           script: |
             cd ~/esmos-infrastructure
             git pull origin main
-            docker-compose up -d --remove-orphans
+            docker-compose -p is214 up -d --remove-orphans
             docker image prune -f
             echo "Deployed at $(date)"
