@@ -3,12 +3,10 @@ services:
     image: nginx:alpine
     ports:
       - "80:80"
-      - "8080:8080"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - web
-      - moodle
     restart: unless-stopped
 
   web:
@@ -48,8 +46,8 @@ services:
     image: bitnamilegacy/moodle
     depends_on:
       - moodledb
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"
     environment:
       - MOODLE_DATABASE_HOST=moodledb
       - MOODLE_DATABASE_PORT_NUMBER=3306
